@@ -44,9 +44,9 @@ var generators = {
 
 			_.each(options.files, function(file, idx) {
 				var glyph;
-				if (Buffer.isBuffer(file)) {
+				if (typeof file === 'object') {
 					glyph = new stream.PassThrough()
-					glyph.end(file)
+					glyph.end(file.source)
 				} else {
 					glyph = fs.createReadStream(file)
 				}
