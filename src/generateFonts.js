@@ -1,6 +1,7 @@
 var fs = require('fs')
 var _ = require('underscore')
 var Q = require('q')
+var stream = require('stream')
 
 var svgicons2svgfont = require('svgicons2svgfont')
 var svg2ttf = require('svg2ttf')
@@ -42,13 +43,19 @@ var generators = {
 				})
 
 			_.each(options.files, function(file, idx) {
-				var glyph = fs.createReadStream(file)
+				var glyph;
+				if (Buffer.isBuffer(file)) {
+					glyph = new stream.PassThrough()
+					glyph.end(file)
+				} else {
+					glyph = fs.createReadStream(file)
+				}
 				var name = options.names[idx]
 				var unicode = String.fromCharCode(options.codepoints[name])
-                var ligature = ''
-                for(var i=0;i<name.length;i++) {
-                    ligature+=String.fromCharCode(name.charCodeAt(i))
-                }
+				var ligature = ''
+				for(var i=0;i<name.length;i++) {
+					ligature+=String.fromCharCode(name.charCodeAt(i))
+				}
 				glyph.metadata = {
 					name: name,
 					unicode: [unicode,ligature]
